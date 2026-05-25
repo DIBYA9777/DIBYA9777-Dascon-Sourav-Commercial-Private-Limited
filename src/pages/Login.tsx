@@ -42,8 +42,9 @@ export default function LoginPage() {
     setActionError(null);
     setActionSuccess(null);
     try {
-      await authService.sendForgotPasswordOtp(forgotEmail);
-      setActionSuccess('Verification OTP sent successfully to your email address.');
+      // Simulate API call for demonstration/testing on Frontend
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      setActionSuccess('Verification OTP sent successfully to your email address (Simulated).');
       setMode('RESET_PASS');
     } catch (err: any) {
       setActionError(err.message || 'Failed to dispatch OTP. Please verify email and try again.');
@@ -58,8 +59,9 @@ export default function LoginPage() {
     setActionError(null);
     setActionSuccess(null);
     try {
-      await authService.resetPasswordWithOtp(forgotEmail, otp, newPassword);
-      setActionSuccess('Security Token updated successfully. Please log in.');
+      // Simulate API call for demonstration/testing on Frontend
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      setActionSuccess('Security Token updated successfully (Simulated). Please log in.');
       setMode('LOGIN');
       // Clear forms
       setForgotEmail('');
@@ -127,20 +129,7 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-1">
-                <div className="flex justify-between items-center px-2">
-                  <label htmlFor="security-token" className="block text-[8px] sm:text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">Security Token</label>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMode('FORGOT_OTP');
-                      setActionError(null);
-                      setActionSuccess(null);
-                    }}
-                    className="text-[8px] sm:text-[9px] font-black text-rose-600 hover:text-rose-500 uppercase tracking-[0.1em] italic cursor-pointer focus:outline-none"
-                  >
-                    Forgot Password?
-                  </button>
-                </div>
+                <label htmlFor="security-token" className="block text-[8px] sm:text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] ml-2">Security Token</label>
                 <div className="relative group">
                   <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors">
                        <Lock className="w-4 h-4" />
@@ -154,6 +143,19 @@ export default function LoginPage() {
                     className="w-full bg-slate-50 border-2 border-slate-50 rounded-[1rem] sm:rounded-[1.2rem] py-3 sm:py-4 pl-14 pr-6 outline-none focus:border-blue-500 transition-all font-black text-slate-800 placeholder:text-slate-455 shadow-inner text-xs"
                     placeholder="••••••••"
                   />
+                </div>
+                <div className="text-right px-2 mt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode('FORGOT_OTP');
+                      setActionError(null);
+                      setActionSuccess(null);
+                    }}
+                    className="text-[8px] sm:text-[9px] font-black text-rose-600 hover:text-rose-500 uppercase tracking-[0.1em] italic cursor-pointer focus:outline-none"
+                  >
+                    Forgot Password?
+                  </button>
                 </div>
               </div>
             </div>
