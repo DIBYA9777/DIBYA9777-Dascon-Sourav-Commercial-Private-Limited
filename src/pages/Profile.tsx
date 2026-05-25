@@ -2,12 +2,14 @@ import React from 'react';
 import { useAuth } from '@/src/context/AuthContext.tsx';
 import { User, Shield, Contact, Building, MapPin, Phone, Mail, Calendar, Droplet, CreditCard, Lock } from 'lucide-react';
 import { Modal } from '@/src/components/Modal.tsx';
+import { authService } from '@/src/services/authService.ts';
 
 export default function ProfilePage() {
   const { user } = useAuth();
   
   // Reset Password State Definitions
   const [isResetOpen, setIsResetOpen] = React.useState(false);
+  const [oldPassword, setOldPassword] = React.useState('');
   const [newPassword, setNewPassword] = React.useState('');
   const [confirmPassword, setConfirmPassword] = React.useState('');
   const [loading, setLoading] = React.useState(false);
@@ -19,17 +21,19 @@ export default function ProfilePage() {
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
-      setErrorMsg('Passwords do not match.');
+      setErrorMsg('New passwords do not match.');
       return;
     }
     setLoading(true);
     setErrorMsg(null);
     setSuccessMsg(null);
     try {
-      // Simulate API call for demonstration/testing on Frontend
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      setSuccessMsg('Your security password has been updated successfully (Simulated).');
-      // Reset states
+      const response = await authService.changePassword(oldPassword, newPassword);
+      if (response.success === false) {
+        throw new Error(response.message || 'Failed to update password.');
+      }
+      setSuccessMsg(response.message || 'Your security password has been updated successfully.');
+      setOldPassword('');
       setNewPassword('');
       setConfirmPassword('');
       setTimeout(() => {
@@ -37,7 +41,7 @@ export default function ProfilePage() {
         setSuccessMsg(null);
       }, 2000);
     } catch (err: any) {
-      setErrorMsg('Failed to update password. Please try again.');
+      setErrorMsg(err.message || 'Failed to update password. Please verify current password.');
     } finally {
       setLoading(false);
     }
@@ -193,6 +197,21 @@ export default function ProfilePage() {
           )}
 
           <div className="space-y-3">
+            <div className="space-y-1">
+              <label htmlFor="old-profile-pass" className="block text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Current Password</label>
+              <div className="relative group">
+                <input
+                  id="old-profile-pass"
+                  type="password"
+                  required
+                  value={oldPassword}
+                  onChange={(e) => setOldPassword(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 outline-none focus:border-blue-500 transition-all font-bold text-slate-800 placeholder:text-slate-300 text-xs"
+                  placeholder="Enter current password"
+                />
+              </div>
+            </div>
+
             <div className="space-y-1">
               <label htmlFor="new-profile-pass" className="block text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">New Password</label>
               <div className="relative group">

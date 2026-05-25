@@ -55,4 +55,15 @@ export const authService = {
     });
     return response.data;
   },
+
+  /**
+   * Updates the logged-in user's password using current and new credentials
+   */
+  async changePassword(oldPassword: string, newPassword: string): Promise<any> {
+    const response = await apiClient.post('/users/change-password', {
+      oldPassword,
+      newPassword,
+    });
+    return response.data;
+  },
 };

@@ -86,6 +86,33 @@ async function startServer() {
     }
   });
 
+  // API Route - Proxy change-password endpoint to Railway backend with Bearer Token matching
+  app.post("/api/users/change-password", async (req, res) => {
+    try {
+      const response = await fetch("https://dascon-backend-production.up.railway.app/api/users/change-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(req.headers.authorization ? { "Authorization": req.headers.authorization } : {}),
+        },
+        body: JSON.stringify(req.body),
+      });
+
+      const text = await response.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (_) {
+        data = { message: text };
+      }
+
+      res.status(response.status).json(data);
+    } catch (error: any) {
+      console.error("Express proxy change-password failed:", error);
+      res.status(500).json({ error: "Express Proxy Failure", message: error.message });
+    }
+  });
+
   // API Route - Proxy registration endpoint to Railway backend with Bearer Token matching
   app.post("/api/admin/register-user", async (req, res) => {
     try {
