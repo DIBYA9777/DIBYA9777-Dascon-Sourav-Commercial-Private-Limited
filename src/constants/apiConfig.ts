@@ -5,7 +5,7 @@
 export const API_BASE_URL = (() => {
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
-    // If running on a Vercel deployment or external domain, bypass the proxy and hit the Railway server directly
+    // If running on a any deployment or external domain, bypass the proxy and hit the Railway server directly
     if (hostname.includes('vercel.app') || (hostname !== 'localhost' && hostname !== '127.0.0.1' && !hostname.includes('.run.app'))) {
       return 'https://dascon-backend-production.up.railway.app/api';
     }

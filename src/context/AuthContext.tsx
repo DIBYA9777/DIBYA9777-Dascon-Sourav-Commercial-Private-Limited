@@ -51,8 +51,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logout = () => {
-    setUser(null);
-    localStorage.removeItem('nway_user');
+    if (window.confirm("Are you sure you want to log out?")) {
+      setUser(null);
+      localStorage.clear();
+    }
   };
 
   return (
