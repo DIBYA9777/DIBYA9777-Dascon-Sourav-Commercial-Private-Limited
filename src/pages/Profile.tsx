@@ -11,7 +11,6 @@ export default function ProfilePage() {
   const [isResetOpen, setIsResetOpen] = React.useState(false);
   const [oldPassword, setOldPassword] = React.useState('');
   const [newPassword, setNewPassword] = React.useState('');
-  const [confirmPassword, setConfirmPassword] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
   const [successMsg, setSuccessMsg] = React.useState<string | null>(null);
@@ -20,10 +19,6 @@ export default function ProfilePage() {
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (newPassword !== confirmPassword) {
-      setErrorMsg('New passwords do not match.');
-      return;
-    }
     setLoading(true);
     setErrorMsg(null);
     setSuccessMsg(null);
@@ -35,7 +30,6 @@ export default function ProfilePage() {
       setSuccessMsg(response.message || 'Your security password has been updated successfully.');
       setOldPassword('');
       setNewPassword('');
-      setConfirmPassword('');
       setTimeout(() => {
         setIsResetOpen(false);
         setSuccessMsg(null);
@@ -223,21 +217,6 @@ export default function ProfilePage() {
                   onChange={(e) => setNewPassword(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 outline-none focus:border-blue-500 transition-all font-bold text-slate-800 placeholder:text-slate-300 text-xs"
                   placeholder="Enter new password"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <label htmlFor="confirm-profile-pass" className="block text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Confirm New Password</label>
-              <div className="relative group">
-                <input
-                  id="confirm-profile-pass"
-                  type="password"
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 outline-none focus:border-blue-500 transition-all font-bold text-slate-800 placeholder:text-slate-300 text-xs"
-                  placeholder="Confirm new password"
                 />
               </div>
             </div>
