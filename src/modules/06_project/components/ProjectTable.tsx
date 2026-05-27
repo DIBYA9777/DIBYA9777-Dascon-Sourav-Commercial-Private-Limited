@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, ChevronLeft, ChevronRight, ArrowUpDown, Eye, Edit3, Archive } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, ArrowUpDown, Eye, Edit3, Archive, Trash2 } from 'lucide-react';
 import { Project } from '../types';
 import ProjectCodeBadge from './ProjectCodeBadge';
 import ProjectStatusBadge from './ProjectStatusBadge';
@@ -12,6 +12,7 @@ interface ProjectTableProps {
   onView: (p: Project) => void;
   onEdit: (p: Project) => void;
   onToggleDeactivate: (p: Project) => void;
+  onDelete?: (id: string) => void;
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
@@ -25,6 +26,7 @@ export default function ProjectTable({
   onView,
   onEdit,
   onToggleDeactivate,
+  onDelete,
   currentPage,
   totalPages,
   onPageChange
@@ -132,6 +134,16 @@ export default function ProjectTable({
                         }`}
                       >
                         <Archive className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDelete && onDelete(proj.id);
+                        }}
+                        title="Delete Project"
+                        className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50/70 rounded-lg transition-colors cursor-pointer"
+                      >
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </td>

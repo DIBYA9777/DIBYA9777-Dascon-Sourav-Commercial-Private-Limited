@@ -56,7 +56,7 @@ export function useProjectForm({ project, onSuccess }: UseProjectFormProps) {
 
     try {
       if (project) {
-        projectService.updateProject({
+        await projectService.updateProject({
           ...project,
           name: name.trim(),
           client: client.trim(),

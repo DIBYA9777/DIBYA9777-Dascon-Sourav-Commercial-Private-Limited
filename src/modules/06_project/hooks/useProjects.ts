@@ -17,8 +17,14 @@ export function useProjects() {
   const [sortField, setSortField] = useState<keyof Project | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-  const loadData = useCallback(() => {
-    setProjects(projectService.getProjects());
+  const loadData = useCallback(async () => {
+    try {
+      const data = await projectService.fetchProjects();
+      setProjects(data);
+    } catch (err: any) {
+      console.error("Failed to load projects from API, falling back to local cache", err);
+      setProjects(projectService.getProjects());
+    }
   }, []);
 
   useEffect(() => {
@@ -43,13 +49,29 @@ export function useProjects() {
     setCurrentPage(1);
   }, []);
 
-  const toggleDeactivate = useCallback((proj: Project) => {
+  const toggleDeactivate = useCallback(async (proj: Project) => {
     const nextStatus = proj.status === 'Archived' ? 'Active' : 'Archived';
-    projectService.updateProject({
-      ...proj,
-      status: nextStatus
-    });
-    loadData();
+    try {
+      await projectService.updateProject({
+        ...proj,
+        status: nextStatus
+      });
+      await loadData();
+    } catch (err: any) {
+      console.error("Failed to update status", err);
+    }
+  }, [loadData]);
+
+  const deleteProject = useCallback(async (id: string) => {
+    if (window.confirm("Are you sure you want to delete this project?")) {
+      try {
+        await projectService.deleteProject(id);
+        await loadData();
+      } catch (err: any) {
+        console.error("Failed to delete project", err);
+        alert(err.message || "Failed to delete project.");
+      }
+    }
   }, [loadData]);
 
   // Filter listings
@@ -123,6 +145,7 @@ export function useProjects() {
     handleSort,
     totalPages,
     toggleDeactivate,
+    deleteProject,
     loadData,
     stats,
     clients

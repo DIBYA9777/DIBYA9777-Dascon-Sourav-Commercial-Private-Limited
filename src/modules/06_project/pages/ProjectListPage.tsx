@@ -32,6 +32,7 @@ export default function ProjectListPage() {
     handleSort,
     totalPages,
     toggleDeactivate,
+    deleteProject,
     loadData,
     stats,
     clients
@@ -176,6 +177,7 @@ export default function ProjectListPage() {
           onView={handleOpenDetail}
           onEdit={handleOpenEdit}
           onToggleDeactivate={toggleDeactivate}
+          onDelete={deleteProject}
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}

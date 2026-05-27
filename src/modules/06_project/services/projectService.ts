@@ -745,9 +745,10 @@ export const projectService = {
     const data = response.data;
 
     let localStatus: Project['status'] = 'Planning';
-    if (data.status === 'ACTIVE') localStatus = 'Active';
+    if (data.status === 'ACTIVE' || data.status === 'ONGOING') localStatus = 'Active';
     else if (data.status === 'COMPLETED') localStatus = 'Completed';
     else if (data.status === 'ARCHIVED') localStatus = 'Archived';
+    else if (data.status === 'PLANNED') localStatus = 'Planning';
 
     const newProj: Project = {
       id: String(data.id),
@@ -769,13 +770,93 @@ export const projectService = {
     projectService.saveProjects(list);
     return newProj;
   },
-  updateProject: (updated: Project) => {
+
+  fetchProjects: async () => {
+    const response = await apiClient.get('/projects');
+    const data = response.data;
+    
+    const list = Array.isArray(data) ? data : (data?.data || []);
+    const mapped: Project[] = list.map((item: any) => {
+      let localStatus: Project['status'] = 'Planning';
+      if (item.status === 'ACTIVE' || item.status === 'ONGOING') localStatus = 'Active';
+      else if (item.status === 'COMPLETED') localStatus = 'Completed';
+      else if (item.status === 'ARCHIVED') localStatus = 'Archived';
+      else if (item.status === 'PLANNED') localStatus = 'Planning';
+
+      return {
+        id: String(item.id),
+        code: item.projectCode || `PRJ-${String(item.id).padStart(3, '0')}`,
+        name: item.projectName || '',
+        client: item.clientName || '',
+        clientContact: item.clientContact || '',
+        siteId: item.siteMapping || '',
+        siteMapping: item.siteMapping || '',
+        startDate: item.startDate || '',
+        endDate: item.endDate || '',
+        status: localStatus,
+        description: '',
+        createdAt: item.createdAt || new Date().toISOString()
+      };
+    });
+
+    projectService.saveProjects(mapped);
+    return mapped;
+  },
+
+  updateProject: async (updated: Project) => {
+    let backendStatus = 'PLANNED';
+    if (updated.status === 'Active') backendStatus = 'ONGOING';
+    else if (updated.status === 'Completed') backendStatus = 'COMPLETED';
+    else if (updated.status === 'Archived') backendStatus = 'ARCHIVED';
+
+    const payload = {
+      projectName: updated.name,
+      clientName: updated.client,
+      clientContact: updated.clientContact || '',
+      siteMapping: updated.siteMapping || updated.siteId || '',
+      startDate: updated.startDate,
+      endDate: updated.endDate,
+      status: backendStatus
+    };
+
+    const response = await apiClient.put(`/projects/${updated.id}`, payload);
+    const data = response.data;
+
+    let localStatus: Project['status'] = 'Planning';
+    if (data.status === 'ACTIVE' || data.status === 'ONGOING') localStatus = 'Active';
+    else if (data.status === 'COMPLETED') localStatus = 'Completed';
+    else if (data.status === 'ARCHIVED') localStatus = 'Archived';
+    else if (data.status === 'PLANNED') localStatus = 'Planning';
+
+    const mappedProj: Project = {
+      id: String(data.id),
+      code: data.projectCode || updated.code,
+      name: data.projectName,
+      client: data.clientName,
+      clientContact: data.clientContact || '',
+      siteId: data.siteMapping || '',
+      siteMapping: data.siteMapping || '',
+      startDate: data.startDate,
+      endDate: data.endDate,
+      status: localStatus,
+      description: updated.description || '',
+      createdAt: data.createdAt || updated.createdAt
+    };
+
     const list = projectService.getProjects();
-    const idx = list.findIndex(p => p.id === updated.id);
+    const idx = list.findIndex(p => p.id === mappedProj.id);
     if (idx !== -1) {
-      list[idx] = updated;
+      list[idx] = mappedProj;
       projectService.saveProjects(list);
     }
+    return mappedProj;
+  },
+
+  deleteProject: async (id: string) => {
+    await apiClient.delete(`/projects/${id}`);
+    const list = projectService.getProjects();
+    const filtered = list.filter(p => p.id !== id);
+    projectService.saveProjects(filtered);
   },
 
   // WBS Structure
